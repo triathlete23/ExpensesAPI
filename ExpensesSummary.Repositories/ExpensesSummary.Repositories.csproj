@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Context\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExpensesSummary.Domain\ExpensesSummary.Domain.csproj" />
+    <ProjectReference Include="..\ExpensesSummary.Infrasctructure\ExpensesSummary.Infrasctructure.csproj" />
+  </ItemGroup>
+
+</Project>
