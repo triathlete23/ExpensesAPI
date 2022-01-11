@@ -69,6 +69,7 @@ namespace ExpensesSummary.Domain.Services
                 {
                     return ResultError.WithError("Expense has been made by an unknown user.");
                 }
+                expense.User.Id = user.Id;
 
                 if (expense.User.Currency != user.Currency)
                 {
@@ -88,7 +89,7 @@ namespace ExpensesSummary.Domain.Services
 
         public async Task<Result<IEnumerable<Expense>>> GetAllAsync(User user, string sortOption = null)
         {
-            if (user == null) 
+            if (user == null || string.IsNullOrEmpty(user.Lastname) || string.IsNullOrEmpty(user.Firstname))
             {
                 return ResultError.WithError("User has to be specified.");
             }

@@ -1,26 +1,57 @@
 ﻿using ExpensesSummary.Domain.Models;
 using ExpensesSummary.Domain.Ports;
+using ExpensesSummary.Repositories.Context;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ExpensesSummary.Repositories.Repositories
 {
     public class ExpensesRepository : IExpensesRepository
     {
+        private readonly ExpenseContext dbContext;
+
+        public ExpensesRepository(ExpenseContext context)
+        {
+            this.dbContext = context;
+        }
+
         public async Task<bool> ContainsAsync(double amount, DateTime date)
         {
-            throw new NotImplementedException();
+            var list = await dbContext.Expenses.Where(el => el.Amount == amount && el.Date.Equals(date)).ToListAsync();
+            return list.Any();
         }
 
         public async Task<ICollection<Guid>> CreateAsync(ICollection<Expense> expenses)
         {
-            throw new NotImplementedException();
+            var ids = new List<Guid>();
+            foreach(var expense in expenses)
+            {
+                var entity = expense.ToEntity();
+                
+                entity.Id = Guid.NewGuid();
+                
+                await dbContext.Expenses.AddAsync(entity);
+                ids.Add(entity.Id);
+            }
+
+            await dbContext.SaveChangesAsync();
+            return ids;
         }
         
         public async Task<IEnumerable<Expense>> GetAllAsync(User user)
         {
-            throw new NotImplementedException();
+            var dbUser = await dbContext.Users.Include(el => el.Expenses).FirstOrDefaultAsync(el => el.Firstname == user.Firstname && el.Lastname == user.Lastname);
+            var expenses = dbUser.Expenses.Select(el => el.ToDomainModel());
+            
+            foreach (var expense in expenses)
+            {
+                expense.User = new User { Firstname = user.Firstname, Lastname = user.Lastname };
+            }
+
+            return expenses;
         }
     }
 }
