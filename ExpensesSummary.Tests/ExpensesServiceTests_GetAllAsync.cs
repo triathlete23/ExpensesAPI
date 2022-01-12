@@ -23,7 +23,7 @@ namespace ExpensesSummary.Tests
         public ExpensesServiceTests_GetAllAsync()
         {
             this.expensesRepository = new Mock<IExpensesRepository>();
-            this.service = new ExpensesService(this.expensesRepository.Object, Mock.Of<IUsersRepository>());
+            this.service = new ExpensesService(this.expensesRepository.Object);
 
             this.user = new User
             {

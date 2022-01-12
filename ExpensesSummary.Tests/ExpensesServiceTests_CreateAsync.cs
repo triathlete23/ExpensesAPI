@@ -16,15 +16,13 @@ namespace ExpensesSummary.Tests
         private readonly IExpensesService service;
 
         private readonly Mock<IExpensesRepository> expensesRepository;
-        private readonly Mock<IUsersRepository> usersRepository;
 
         private readonly List<Expense> expenses;
 
         public ExpensesServiceTests_CreateAsync()
         {
             this.expensesRepository = new Mock<IExpensesRepository>();
-            this.usersRepository = new Mock<IUsersRepository>();
-            this.service = new ExpensesService(this.expensesRepository.Object, this.usersRepository.Object);
+            this.service = new ExpensesService(this.expensesRepository.Object);
 
             this.expenses = new List<Expense>
             {
@@ -97,7 +95,7 @@ namespace ExpensesSummary.Tests
         [Fact]
         public async void ReturnErrorIfExpenseHasBeenDoneByUnknownUser()
         {
-            this.usersRepository.Setup(mock => mock.GetAsync(this.expenses[0].User.Lastname, this.expenses[0].User.Firstname))
+            this.expensesRepository.Setup(mock => mock.GetAsync(this.expenses[0].User.Lastname, this.expenses[0].User.Firstname))
                 .ReturnsAsync((User)null);
 
             var result = await this.service.CreateAsync(this.expenses);
@@ -108,7 +106,7 @@ namespace ExpensesSummary.Tests
         [Fact]
         public async void ReturnErrorIfExpenseCurrencyDiffersToUserCurrency()
         {
-            this.usersRepository.Setup(mock => mock.GetAsync(this.expenses[0].User.Lastname, this.expenses[0].User.Firstname))
+            this.expensesRepository.Setup(mock => mock.GetAsync(this.expenses[0].User.Lastname, this.expenses[0].User.Firstname))
                 .ReturnsAsync(new User { Currency = Currency.Rouble });
 
             var result = await this.service.CreateAsync(this.expenses);
@@ -120,7 +118,7 @@ namespace ExpensesSummary.Tests
         public async void CreateAnExpense()
         {
             var id = Guid.NewGuid();
-            this.usersRepository.Setup(mock => mock.GetAsync(this.expenses[0].User.Lastname, this.expenses[0].User.Firstname))
+            this.expensesRepository.Setup(mock => mock.GetAsync(this.expenses[0].User.Lastname, this.expenses[0].User.Firstname))
                 .ReturnsAsync(new User { Currency = Currency.Dollar });
             this.expensesRepository.Setup(mock => mock.CreateAsync(It.Is<ICollection<Expense>>(el =>
                 el.All(el1 => el1.Amount == this.expenses[0].Amount &&
@@ -137,7 +135,7 @@ namespace ExpensesSummary.Tests
         [Fact]
         public async void ReturnErrorIfExpensesAreNotCreatedInDb()
         {
-            this.usersRepository.Setup(mock => mock.GetAsync(this.expenses[0].User.Lastname, this.expenses[0].User.Firstname))
+            this.expensesRepository.Setup(mock => mock.GetAsync(this.expenses[0].User.Lastname, this.expenses[0].User.Firstname))
                 .ReturnsAsync(new User { Currency = Currency.Dollar });
             this.expensesRepository.Setup(mock => mock.CreateAsync(It.Is<ICollection<Expense>>(el =>
                 el.All(el1 => el1.Amount == this.expenses[0].Amount &&
@@ -169,10 +167,10 @@ namespace ExpensesSummary.Tests
                     }
                 });
 
-            this.usersRepository.Setup(mock => mock.GetAsync(this.expenses[0].User.Lastname, this.expenses[0].User.Firstname))
+            this.expensesRepository.Setup(mock => mock.GetAsync(this.expenses[0].User.Lastname, this.expenses[0].User.Firstname))
                 .ReturnsAsync(new User { Currency = Currency.Dollar });
 
-            this.usersRepository.Setup(mock => mock.GetAsync(this.expenses[1].User.Lastname, this.expenses[1].User.Firstname))
+            this.expensesRepository.Setup(mock => mock.GetAsync(this.expenses[1].User.Lastname, this.expenses[1].User.Firstname))
                 .ReturnsAsync(new User { Currency = Currency.Rouble });
 
             var ids = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };

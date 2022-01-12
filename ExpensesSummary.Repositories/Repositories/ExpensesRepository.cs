@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ExpensesSummary.Repositories.Extensions;
 
 namespace ExpensesSummary.Repositories.Repositories
 {
@@ -52,6 +53,12 @@ namespace ExpensesSummary.Repositories.Repositories
             }
 
             return expenses;
+        }
+
+        public async Task<User> GetAsync(string lastname, string firstname)
+        {
+            var user = await dbContext.Users.FirstOrDefaultAsync(el => el.Lastname == lastname && el.Firstname == firstname);
+            return user.ToDomainModel();
         }
     }
 }

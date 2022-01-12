@@ -26,12 +26,10 @@ namespace ExpensesSummary.Domain.Services
         };
 
         private readonly IExpensesRepository expensesRepository;
-        private readonly IUsersRepository usersRepository;
 
-        public ExpensesService(IExpensesRepository expensesRepository, IUsersRepository usersRepository)
+        public ExpensesService(IExpensesRepository expensesRepository)
         {
             this.expensesRepository = expensesRepository;
-            this.usersRepository = usersRepository;
         }
 
         public async Task<Result<ICollection<Guid>>> CreateAsync(ICollection<Expense> expenses)
@@ -64,7 +62,7 @@ namespace ExpensesSummary.Domain.Services
                     return ResultError.WithError("Expense has been already created.");
                 }
 
-                var user = await this.usersRepository.GetAsync(expense.User.Lastname, expense.User.Firstname);
+                var user = await this.expensesRepository.GetAsync(expense.User.Lastname, expense.User.Firstname);
                 if (user == null)
                 {
                     return ResultError.WithError("Expense has been made by an unknown user.");

@@ -36,7 +36,6 @@ namespace ExpensesSummary
 
             services.AddScoped<IExpensesService, ExpensesService>();
             services.AddScoped<IExpensesRepository, ExpensesRepository>();
-            services.AddScoped<IUsersRepository, UsersRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
