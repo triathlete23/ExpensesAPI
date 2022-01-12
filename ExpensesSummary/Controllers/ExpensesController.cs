@@ -21,7 +21,7 @@ namespace ExpensesSummary.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromBody] GetRequest request)
+        public async Task<IActionResult> GetAllAsync([FromBody] GetRequest request)
         {
             var serviceResult = await expensesService.GetAllAsync(request.User, request.SortOption);
             if (serviceResult.HasError)
@@ -29,11 +29,11 @@ namespace ExpensesSummary.Controllers
                 return BadRequest(serviceResult.Error);
             }
 
-            return Ok(serviceResult.Data.Select(el => el.ToApiResponse()));
+            return Ok(serviceResult.Data.Select(el => el.ToApiResponse()).ToArray());
         }
 
         [HttpPost]        
-        public async Task<IActionResult> Create([FromBody] ICollection<Expense> expenses)
+        public async Task<IActionResult> CreateAsync([FromBody] ICollection<Expense> expenses)
         {
             var serviceResult = await expensesService.CreateAsync(expenses);
             if (serviceResult.HasError)

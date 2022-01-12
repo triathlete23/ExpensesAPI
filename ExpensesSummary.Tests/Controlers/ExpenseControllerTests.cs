@@ -1,13 +1,15 @@
-﻿using ExpensesSummary.Api.Requests;
+﻿using ExpensesSummary.Api.Models;
+using ExpensesSummary.Api.Requests;
 using ExpensesSummary.Controllers;
+using ExpensesSummary.Domain.Constants;
 using ExpensesSummary.Domain.DomainResult;
-using ExpensesSummary.Domain.Models;
 using ExpensesSummary.Domain.Ports;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace ExpensesSummary.Tests.Controlers
@@ -19,10 +21,11 @@ namespace ExpensesSummary.Tests.Controlers
         private readonly GetRequest request;
         public ExpenseControllerTests()
         {
+            this.service = new Mock<IExpensesService>();
             this.controller = new ExpensesController(service.Object);
             this.request = new GetRequest
             {
-                User = new User
+                User = new Domain.Models.User
                 {
                     Firstname = "Anthony",
                     Lastname = "Spark"
@@ -34,11 +37,54 @@ namespace ExpensesSummary.Tests.Controlers
         public async void ReturnBadRequestIfGetAllAsyncReturnsAnError()
         {
             var error = "error";
-            this.service.Setup(mock => mock.GetAllAsync(It.Is<User>(u => u.Lastname == this.request.User.Lastname), null)).ReturnsAsync(ResultError.WithError(error));
+            this.service.Setup(mock => mock.GetAllAsync(It.Is<Domain.Models.User>(u => u.Lastname == this.request.User.Lastname), null)).ReturnsAsync(ResultError.WithError(error));
 
-            var response = await this.controller.GetAll(request);
+            var result = await this.controller.GetAllAsync(request);
 
-            Assert.Equal(400, ((ObjectResult)response).StatusCode);
+            Assert.Equal(400, ((ObjectResult)result).StatusCode);
+            Assert.Equal(error, ((ObjectResult)result).Value);
+        }
+
+        [Fact]
+        public async void ReturnOKIfGetAllAsyncReturnsData()
+        {
+            this.service.Setup(mock => mock.GetAllAsync(It.Is<Domain.Models.User>(u => u.Lastname == this.request.User.Lastname), null)).ReturnsAsync(Result<IEnumerable<Domain.Models.Expense>>.WithData(new Domain.Models.Expense[] { new Domain.Models.Expense
+            {
+                Currency = Currency.Dollar,
+                Nature = Domain.Enums.Nature.Restaurant,
+                Comment = "Comment",
+                Amount = 10,
+                Date = DateTime.Parse("2021/12/15"),
+                User = new Domain.Models.User{ Currency = Currency.Dollar, Firstname = "Romanova", Lastname = "Natasha"}
+            } }));
+
+            var result = await this.controller.GetAllAsync(request);
+
+            Assert.Equal(200, ((ObjectResult)result).StatusCode);
+            Assert.Single((IEnumerable<Expense>)((ObjectResult)result).Value);
+        }
+
+        [Fact]
+        public async void ReturnBadRequestIfCreateAsyncReturnsAnError()
+        {
+            var error = "error";
+            this.service.Setup(mock => mock.CreateAsync(It.IsAny<ICollection<Domain.Models.Expense>>())).ReturnsAsync(ResultError.WithError(error));
+            var result = await this.controller.CreateAsync(new List<Domain.Models.Expense> { new Domain.Models.Expense() });
+
+            Assert.Equal(400, ((ObjectResult)result).StatusCode);
+            Assert.Equal(error, ((ObjectResult)result).Value);
+        }
+
+        [Fact]
+        public async void ReturnOKIfCreateAsyncReturnsData()
+        {
+            this.service.Setup(mock => mock.CreateAsync(It.IsAny<ICollection<Domain.Models.Expense>>())).ReturnsAsync(
+                Result<ICollection<Guid>>.WithData(new List<Guid> { Guid.NewGuid(), Guid.NewGuid() })
+                );
+            var result = await this.controller.CreateAsync(new List<Domain.Models.Expense> { new Domain.Models.Expense() });
+
+            Assert.Equal(200, ((ObjectResult)result).StatusCode);
+            Assert.Equal(2, ((ICollection<Guid>)((ObjectResult)result).Value).Count);
         }
     }
 }

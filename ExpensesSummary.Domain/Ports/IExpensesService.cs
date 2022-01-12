@@ -8,7 +8,7 @@ namespace ExpensesSummary.Domain.Ports
 {
     public interface IExpensesService
     {
-        public Task<Result<ICollection<Guid>>> CreateAsync(ICollection<Expense> expense);
+        public Task<Result<ICollection<Guid>>> CreateAsync(ICollection<Expense> expenses);
         public Task<Result<IEnumerable<Expense>>> GetAllAsync(User user, string sortOption = null);
     }
 }
