@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ExpensesSummary.Domain\ExpensesSummary.Domain.csproj" />
-    <ProjectReference Include="..\ExpensesSummary.Infrasctructure\ExpensesSummary.Infrasctructure.csproj" />
   </ItemGroup>
 
 </Project>
