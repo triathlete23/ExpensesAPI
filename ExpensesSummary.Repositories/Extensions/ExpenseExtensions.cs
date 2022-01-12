@@ -1,7 +1,7 @@
 ﻿using ExpensesSummary.Repositories.Models;
 using System;
 
-namespace ExpensesSummary.Repositories
+namespace ExpensesSummary.Repositories.Extensions
 {
     public static class ExpenseExtensions
     {
@@ -14,6 +14,7 @@ namespace ExpensesSummary.Repositories
 
             return new Expense
             {
+                Id = Guid.NewGuid(),
                 Amount = model.Amount,
                 Comment = model.Comment,
                 Currency = model.Currency,

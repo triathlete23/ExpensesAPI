@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.13" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageReference Include="Moq" Version="4.16.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
@@ -22,6 +23,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ExpensesSummary.Domain\ExpensesSummary.Domain.csproj" />
+    <ProjectReference Include="..\ExpensesSummary.Repositories\ExpensesSummary.Repositories.csproj" />
+    <ProjectReference Include="..\ExpensesSummary\ExpensesSummary.Api.csproj" />
   </ItemGroup>
 
 </Project>

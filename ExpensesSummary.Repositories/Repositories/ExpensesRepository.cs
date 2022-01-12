@@ -21,8 +21,7 @@ namespace ExpensesSummary.Repositories.Repositories
 
         public async Task<bool> ContainsAsync(double amount, DateTime date)
         {
-            var list = await dbContext.Expenses.Where(el => el.Amount == amount && el.Date.Equals(date)).ToListAsync();
-            return list.Any();
+            return await dbContext.Expenses.AnyAsync(el => el.Amount == amount && el.Date.Equals(date));
         }
 
         public async Task<ICollection<Guid>> CreateAsync(ICollection<Expense> expenses)
@@ -31,9 +30,6 @@ namespace ExpensesSummary.Repositories.Repositories
             foreach(var expense in expenses)
             {
                 var entity = expense.ToEntity();
-                
-                entity.Id = Guid.NewGuid();
-                
                 await dbContext.Expenses.AddAsync(entity);
                 ids.Add(entity.Id);
             }
@@ -55,9 +51,11 @@ namespace ExpensesSummary.Repositories.Repositories
             return expenses;
         }
 
-        public async Task<User> GetAsync(string lastname, string firstname)
+        public async Task<User> GetUserAsync(string lastname, string firstname)
         {
-            var user = await dbContext.Users.FirstOrDefaultAsync(el => el.Lastname == lastname && el.Firstname == firstname);
+            var user = await dbContext.Users.FirstOrDefaultAsync(el => 
+                el.Lastname.ToLower() == lastname.ToLower() && 
+                el.Firstname.ToLower() == firstname.ToLower());
             return user.ToDomainModel();
         }
     }

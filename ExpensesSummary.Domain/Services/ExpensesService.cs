@@ -48,7 +48,7 @@ namespace ExpensesSummary.Domain.Services
                     return ResultError.WithError($"Expense with the amount {expense.Amount} and for the date {expense.Date} has been already created.");
                 }
 
-                var user = await this.expensesRepository.GetAsync(expense.User.Lastname, expense.User.Firstname);
+                var user = await this.expensesRepository.GetUserAsync(expense.User.Lastname, expense.User.Firstname);
                 if (user == null)
                 {
                     return ResultError.WithError($"Expense with the amount {expense.Amount} and for the date {expense.Date} has been made by an unknown user.");
@@ -57,7 +57,7 @@ namespace ExpensesSummary.Domain.Services
 
                 if (expense.Currency != user.Currency)
                 {
-                    return ResultError.WithError($"Expense with the amount {expense.Amount} and for the date {expense.Date} currency is different to its user's currency.");
+                    return ResultError.WithError($"Expense with the amount {expense.Amount} and for the date {expense.Date} has the currency that is different to its user's currency.");
                 }
             }
 

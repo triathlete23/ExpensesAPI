@@ -69,7 +69,17 @@ namespace ExpensesSummary.Tests
         {
             var result = await this.service.GetAllAsync(null);
 
-            Assert.Equal("User has to be specified.", result.Error);
+            Assert.Equal("User's firstname and lastname has to be specified.", result.Error);
+        }
+
+        [Theory]
+        [InlineData("", "Natasha")]
+        [InlineData("Romanova", "")]
+        public async void ReturnErrorIfFirstnameOrLastnameIsEmpty(string firstname, string lastname)
+        {
+            var result = await this.service.GetAllAsync(new User { Firstname = firstname, Lastname = lastname });
+
+            Assert.Equal("User's firstname and lastname has to be specified.", result.Error);
         }
 
         [Fact]
