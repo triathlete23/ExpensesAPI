@@ -11,20 +11,6 @@ namespace ExpensesSummary.Domain.Services
 {
     public class ExpensesService : IExpensesService
     {
-        private Expense[] expenses = new Expense[]
-        {
-            new Expense
-            {
-                Id = Guid.NewGuid(),
-                Date = DateTime.Today
-            },
-            new Expense
-            {
-                Id = Guid.NewGuid(),
-                Date = DateTime.Now
-            }
-        };
-
         private readonly IExpensesRepository expensesRepository;
 
         public ExpensesService(IExpensesRepository expensesRepository)
@@ -43,35 +29,35 @@ namespace ExpensesSummary.Domain.Services
             {
                 if (expense.Date >= DateTime.Now)
                 {
-                    return ResultError.WithError("Expense's date must be in the past.");
+                    return ResultError.WithError($"Expense with the amount {expense.Amount} and the date {expense.Date} must be in the past.");
                 }
 
                 if (expense.Date < DateTime.Today.AddMonths(-3))
                 {
-                    return ResultError.WithError("Expense should be done during the last 3 months.");
+                    return ResultError.WithError($"Expense with the amount {expense.Amount} and the date {expense.Date} should be done during the last 3 months.");
                 }
 
                 if (string.IsNullOrEmpty(expense.Comment))
                 {
-                    return ResultError.WithError("Comment should not be empty.");
+                    return ResultError.WithError($"Expense with the amount {expense.Amount} and the date {expense.Date} should contain a comment.");
                 }
 
                 var doesExpenseExist = await this.expensesRepository.ContainsAsync(expense.Amount, expense.Date);
                 if (doesExpenseExist)
                 {
-                    return ResultError.WithError("Expense has been already created.");
+                    return ResultError.WithError($"Expense with the amount {expense.Amount} and for the date {expense.Date} has been already created.");
                 }
 
                 var user = await this.expensesRepository.GetAsync(expense.User.Lastname, expense.User.Firstname);
                 if (user == null)
                 {
-                    return ResultError.WithError("Expense has been made by an unknown user.");
+                    return ResultError.WithError($"Expense with the amount {expense.Amount} and for the date {expense.Date} has been made by an unknown user.");
                 }
                 expense.User.Id = user.Id;
 
-                if (expense.User.Currency != user.Currency)
+                if (expense.Currency != user.Currency)
                 {
-                    return ResultError.WithError("Expense's currency is different to user's currency.");
+                    return ResultError.WithError($"Expense with the amount {expense.Amount} and for the date {expense.Date} currency is different to its user's currency.");
                 }
             }
 
@@ -89,7 +75,7 @@ namespace ExpensesSummary.Domain.Services
         {
             if (user == null || string.IsNullOrEmpty(user.Lastname) || string.IsNullOrEmpty(user.Firstname))
             {
-                return ResultError.WithError("User has to be specified.");
+                return ResultError.WithError("User's firstname and lastname has to be specified.");
             }
 
             var expenses = await this.expensesRepository.GetAllAsync(user);

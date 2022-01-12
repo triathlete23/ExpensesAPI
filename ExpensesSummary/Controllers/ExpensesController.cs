@@ -1,8 +1,10 @@
-﻿using ExpensesSummary.Api.Requests;
+﻿using ExpensesSummary.Api.Extensions;
+using ExpensesSummary.Api.Requests;
 using ExpensesSummary.Domain.Models;
 using ExpensesSummary.Domain.Ports;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ExpensesSummary.Controllers
@@ -27,7 +29,7 @@ namespace ExpensesSummary.Controllers
                 return BadRequest(serviceResult.Error);
             }
 
-            return Ok(serviceResult.Data);
+            return Ok(serviceResult.Data.Select(el => el.ToApiResponse()));
         }
 
         [HttpPost]        

@@ -45,7 +45,7 @@ namespace ExpensesSummary.Repositories.Repositories
         public async Task<IEnumerable<Expense>> GetAllAsync(User user)
         {
             var dbUser = await dbContext.Users.Include(el => el.Expenses).FirstOrDefaultAsync(el => el.Firstname == user.Firstname && el.Lastname == user.Lastname);
-            var expenses = dbUser.Expenses.Select(el => el.ToDomainModel());
+            var expenses = dbUser.Expenses.Select(el => el.ToDomainModel()).ToArray();
             
             foreach (var expense in expenses)
             {
