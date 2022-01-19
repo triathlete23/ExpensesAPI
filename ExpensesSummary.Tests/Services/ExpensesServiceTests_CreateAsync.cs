@@ -83,6 +83,16 @@ namespace ExpensesSummary.Tests
         }
 
         [Fact]
+        public async void ReturnErrorIfExpensesContainSameEntities()
+        {
+            this.expenses.Add(this.expenses[0]);
+
+            var result = await this.service.CreateAsync(this.expenses);
+
+            Assert.Equal($"Expense with the amount {this.expenses[0].Amount} and the date {this.expenses[0].Date} is duplicated.", result.Error);
+        }
+
+        [Fact]
         public async void ReturnErrorIfExpenseHasBeenAlreadyCreated()
         {
             this.expensesRepository.Setup(mock => mock.ContainsAsync(this.expenses[0].Amount, this.expenses[0].Date))

@@ -42,6 +42,11 @@ namespace ExpensesSummary.Domain.Services
                     return ResultError.WithError($"Expense with the amount {expense.Amount} and the date {expense.Date} should contain a comment.");
                 }
 
+                if (expenses.Count(el => el.Amount == expense.Amount && el.Date == expense.Date) > 1)
+                {
+                    return ResultError.WithError($"Expense with the amount {expense.Amount} and the date {expense.Date} is duplicated.");
+                }
+
                 var doesExpenseExist = await this.expensesRepository.ContainsAsync(expense.Amount, expense.Date);
                 if (doesExpenseExist)
                 {
