@@ -8,8 +8,8 @@ namespace ExpensesSummary.Domain.Ports
     public interface IExpensesRepository
     {
         Task<ICollection<Guid>> CreateAsync(ICollection<Expense> expenses);
-        Task<IEnumerable<Expense>> GetAllAsync(User user);
+        Task<IEnumerable<Expense>> GetAllAsync(Guid userId);
         Task<bool> ContainsAsync(double amount, DateTime date);        
-        Task<User> GetUserAsync(string lastname, string firstname);
+        Task<User> GetUserAsync(Guid userId);
     }
 }

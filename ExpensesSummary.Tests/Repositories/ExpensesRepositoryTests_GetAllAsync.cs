@@ -16,7 +16,9 @@ namespace ExpensesSummary.Tests.Repositories
             using var context = TestDbInitilizer.Initialize();
             var expensesRepository = new ExpensesRepository(context);
 
-            var result = await expensesRepository.GetAllAsync(new User { Firstname = "Anthony", Lastname = "Spark" });
+            var tonySparkId = context.Users.Single(el => el.Lastname == "Spark" && el.Firstname == "Anthony").Id;
+
+            var result = await expensesRepository.GetAllAsync(tonySparkId);
 
             Assert.Single(result);
             Assert.Equal(10, result.Single().Amount);

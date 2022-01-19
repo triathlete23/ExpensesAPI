@@ -1,10 +1,11 @@
 ﻿using ExpensesSummary.Domain.Models;
+using System;
 
 namespace ExpensesSummary.Api.Requests
 {
     public class GetRequest
     {
-        public User User { get; set; }
+        public string UserId { get; set; }
         public string SortOption { get; set; }
     }
 }

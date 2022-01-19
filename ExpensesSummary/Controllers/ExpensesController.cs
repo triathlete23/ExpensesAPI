@@ -23,7 +23,7 @@ namespace ExpensesSummary.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllAsync([FromBody] GetRequest request)
         {
-            var serviceResult = await expensesService.GetAllAsync(request.User, request.SortOption);
+            var serviceResult = await expensesService.GetAllAsync(request.UserId, request.SortOption);
             if (serviceResult.HasError)
             {
                 return BadRequest(serviceResult.Error);

@@ -12,5 +12,6 @@ namespace ExpensesSummary.Domain.Models
         public double Amount { get; set; }
         public string Currency { get; set; }
         public string Comment { get; set; }
+        public Guid UserId { get; set; }
     }
 }

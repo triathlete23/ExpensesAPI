@@ -17,20 +17,13 @@ namespace ExpensesSummary.Tests
 
         private readonly Mock<IExpensesRepository> expensesRepository;
 
-        private readonly User user;
+        private readonly Guid userId = Guid.NewGuid();
         private readonly ICollection<Expense> expenses;
 
         public ExpensesServiceTests_GetAllAsync()
         {
             this.expensesRepository = new Mock<IExpensesRepository>();
             this.service = new ExpensesService(this.expensesRepository.Object);
-
-            this.user = new User
-            {
-                Currency = Currency.Rouble,
-                Firstname = "Natasha",
-                Lastname = "Romanova"
-            };
 
             this.expenses = new List<Expense>
             {
@@ -41,7 +34,7 @@ namespace ExpensesSummary.Tests
                     Comment = "Some comment",
                     Date = DateTime.Parse("13/12/2021"),
                     Nature = Domain.Enums.Nature.Restaurant,
-                    User = user
+                    UserId = this.userId
                 },
                 new Expense
                 {
@@ -50,7 +43,7 @@ namespace ExpensesSummary.Tests
                     Comment = "Some comment",
                     Date = DateTime.Parse("08/01/2022"),
                     Nature = Domain.Enums.Nature.Misc,
-                    User = user
+                    UserId = this.userId
                 },
                 new Expense
                 {
@@ -59,33 +52,31 @@ namespace ExpensesSummary.Tests
                     Comment = "Another comment",
                     Date = DateTime.Parse("07/01/2022"),
                     Nature = Domain.Enums.Nature.Hotel,
-                    User = user
+                    UserId = this.userId
                 }
             };
         }
 
         [Fact]
-        public async void ReturnErrorIfUserIsNull()
+        public async void ReturnErrorIfUserIdIsAbsent()
         {
-            var result = await this.service.GetAllAsync(null);
+            var result = await this.service.GetAllAsync("");
 
-            Assert.Equal("User's firstname and lastname has to be specified.", result.Error);
+            Assert.Equal("UserId cannot be empty.", result.Error);
         }
 
-        [Theory]
-        [InlineData("", "Natasha")]
-        [InlineData("Romanova", "")]
-        public async void ReturnErrorIfFirstnameOrLastnameIsEmpty(string firstname, string lastname)
+        [Fact]
+        public async void ReturnErrorIfUserIdCannotBeParsed()
         {
-            var result = await this.service.GetAllAsync(new User { Firstname = firstname, Lastname = lastname });
+            var result = await this.service.GetAllAsync("invalid");
 
-            Assert.Equal("User's firstname and lastname has to be specified.", result.Error);
+            Assert.Equal("UserId has an incorrect format.", result.Error);
         }
 
         [Fact]
         public async void ReturnErrorIfThereAreNoExpensesForUser()
         {
-            var result = await this.service.GetAllAsync(user);
+            var result = await this.service.GetAllAsync(Guid.NewGuid().ToString());
 
             Assert.Equal("There are no expenses for current user.", result.Error);
         }
@@ -93,10 +84,10 @@ namespace ExpensesSummary.Tests
         [Fact]
         public async Task GetAllSortedByAmount()
         {
-            this.expensesRepository.Setup(mock => mock.GetAllAsync(It.Is<User>(el => el.Firstname == "Natasha" && el.Lastname == "Romanova")))
+            this.expensesRepository.Setup(mock => mock.GetAllAsync(this.userId))
                 .ReturnsAsync(expenses);
 
-            var result = await this.service.GetAllAsync(user);
+            var result = await this.service.GetAllAsync(this.userId.ToString());
 
             Assert.Equal(20, result.Data.ElementAt(0).Amount);
             Assert.Equal(66.8, result.Data.ElementAt(1).Amount);
@@ -106,10 +97,10 @@ namespace ExpensesSummary.Tests
         [Fact]
         public async Task GetAllSortedByDate()
         {
-            this.expensesRepository.Setup(mock => mock.GetAllAsync(It.Is<User>(el => el.Firstname == "Natasha" && el.Lastname == "Romanova")))
+            this.expensesRepository.Setup(mock => mock.GetAllAsync(this.userId))
                 .ReturnsAsync(expenses);
 
-            var result = await this.service.GetAllAsync(user, "date");
+            var result = await this.service.GetAllAsync(this.userId.ToString(), "date");
 
             Assert.Equal(DateTime.Parse("13/12/2021"), result.Data.ElementAt(0).Date);
             Assert.Equal(DateTime.Parse("07/01/2022"), result.Data.ElementAt(1).Date);

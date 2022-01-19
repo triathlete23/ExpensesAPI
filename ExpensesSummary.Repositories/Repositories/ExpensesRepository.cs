@@ -38,24 +38,23 @@ namespace ExpensesSummary.Repositories.Repositories
             return ids;
         }
         
-        public async Task<IEnumerable<Expense>> GetAllAsync(User user)
+        public async Task<IEnumerable<Expense>> GetAllAsync(Guid userId)
         {
-            var dbUser = await dbContext.Users.Include(el => el.Expenses).FirstOrDefaultAsync(el => el.Firstname == user.Firstname && el.Lastname == user.Lastname);
+            var dbUser = await dbContext.Users.Include(el => el.Expenses).FirstOrDefaultAsync(el => el.Id == userId);
             var expenses = dbUser.Expenses.Select(el => el.ToDomainModel()).ToArray();
             
             foreach (var expense in expenses)
             {
-                expense.User = new User { Firstname = user.Firstname, Lastname = user.Lastname };
+                expense.User = new User { Firstname = dbUser.Firstname, Lastname = dbUser.Lastname };
             }
 
             return expenses;
         }
 
-        public async Task<User> GetUserAsync(string lastname, string firstname)
+        public async Task<User> GetUserAsync(Guid userId)
         {
             var user = await dbContext.Users.FirstOrDefaultAsync(el => 
-                el.Lastname.ToLower() == lastname.ToLower() && 
-                el.Firstname.ToLower() == firstname.ToLower());
+                el.Id == userId);
             return user.ToDomainModel();
         }
     }

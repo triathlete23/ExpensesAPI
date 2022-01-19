@@ -20,7 +20,7 @@ namespace ExpensesSummary.Repositories.Extensions
                 Currency = model.Currency,
                 Date = model.Date,
                 Nature = model.Nature.ToString(),
-                UserId = model.User.Id
+                UserId = model.UserId
             };
         }
 

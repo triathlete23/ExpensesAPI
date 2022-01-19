@@ -33,6 +33,7 @@ namespace ExpensesSummary.Tests
                     Comment = "Some comment",
                     Date = DateTime.Parse("01/01/2022"),
                     Nature = Domain.Enums.Nature.Restaurant,
+                    UserId = Guid.NewGuid(),
                     User = new User()
                     {
                         Currency = Currency.Dollar,
@@ -95,7 +96,7 @@ namespace ExpensesSummary.Tests
         [Fact]
         public async void ReturnErrorIfExpenseHasBeenDoneByUnknownUser()
         {
-            this.expensesRepository.Setup(mock => mock.GetUserAsync(this.expenses[0].User.Lastname, this.expenses[0].User.Firstname))
+            this.expensesRepository.Setup(mock => mock.GetUserAsync(this.expenses[0].UserId))
                 .ReturnsAsync((User)null);
 
             var result = await this.service.CreateAsync(this.expenses);
@@ -106,7 +107,7 @@ namespace ExpensesSummary.Tests
         [Fact]
         public async void ReturnErrorIfExpenseCurrencyDiffersToUserCurrency()
         {
-            this.expensesRepository.Setup(mock => mock.GetUserAsync(this.expenses[0].User.Lastname, this.expenses[0].User.Firstname))
+            this.expensesRepository.Setup(mock => mock.GetUserAsync(this.expenses[0].UserId))
                 .ReturnsAsync(new User { Currency = Currency.Rouble });
 
             var result = await this.service.CreateAsync(this.expenses);
@@ -118,7 +119,7 @@ namespace ExpensesSummary.Tests
         public async void CreateAnExpense()
         {
             var id = Guid.NewGuid();
-            this.expensesRepository.Setup(mock => mock.GetUserAsync(this.expenses[0].User.Lastname, this.expenses[0].User.Firstname))
+            this.expensesRepository.Setup(mock => mock.GetUserAsync(this.expenses[0].UserId))
                 .ReturnsAsync(new User { Currency = Currency.Dollar });
             this.expensesRepository.Setup(mock => mock.CreateAsync(It.Is<ICollection<Expense>>(el =>
                 el.All(el1 => el1.Amount == this.expenses[0].Amount &&
@@ -135,7 +136,7 @@ namespace ExpensesSummary.Tests
         [Fact]
         public async void ReturnErrorIfExpensesAreNotCreatedInDb()
         {
-            this.expensesRepository.Setup(mock => mock.GetUserAsync(this.expenses[0].User.Lastname, this.expenses[0].User.Firstname))
+            this.expensesRepository.Setup(mock => mock.GetUserAsync(this.expenses[0].UserId))
                 .ReturnsAsync(new User { Currency = Currency.Dollar });
             this.expensesRepository.Setup(mock => mock.CreateAsync(It.Is<ICollection<Expense>>(el =>
                 el.All(el1 => el1.Amount == this.expenses[0].Amount &&
@@ -159,18 +160,13 @@ namespace ExpensesSummary.Tests
                     Comment = "Some comment",
                     Date = DateTime.Parse("08/01/2022"),
                     Nature = Domain.Enums.Nature.Misc,
-                    User = new User()
-                    {
-                        Currency = Currency.Rouble,
-                        Firstname = "Natasha",
-                        Lastname = "Romanova"
-                    }
+                    UserId = Guid.NewGuid()
                 });
 
-            this.expensesRepository.Setup(mock => mock.GetUserAsync(this.expenses[0].User.Lastname, this.expenses[0].User.Firstname))
+            this.expensesRepository.Setup(mock => mock.GetUserAsync(this.expenses[0].UserId))
                 .ReturnsAsync(new User { Currency = Currency.Dollar });
 
-            this.expensesRepository.Setup(mock => mock.GetUserAsync(this.expenses[1].User.Lastname, this.expenses[1].User.Firstname))
+            this.expensesRepository.Setup(mock => mock.GetUserAsync(this.expenses[1].UserId))
                 .ReturnsAsync(new User { Currency = Currency.Rouble });
 
             var ids = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };

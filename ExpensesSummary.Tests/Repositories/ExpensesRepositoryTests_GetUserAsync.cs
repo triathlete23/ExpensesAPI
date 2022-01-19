@@ -2,6 +2,7 @@
 using ExpensesSummary.Repositories.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Xunit;
 
@@ -15,7 +16,9 @@ namespace ExpensesSummary.Tests.Repositories
             using var context = TestDbInitilizer.Initialize();
             var expensesRepository = new ExpensesRepository(context);
 
-            var user = await expensesRepository.GetUserAsync("Spark", "Anthony");
+            var tonySparkId = context.Users.Single(el => el.Lastname == "Spark" && el.Firstname == "Anthony").Id;
+
+            var user = await expensesRepository.GetUserAsync(tonySparkId);
             Assert.NotNull(user);
             Assert.Equal(Currency.Dollar, user.Currency);
             Assert.Equal("Anthony", user.Firstname);
@@ -28,7 +31,7 @@ namespace ExpensesSummary.Tests.Repositories
             using var context = TestDbInitilizer.Initialize();
             var expensesRepository = new ExpensesRepository(context);
 
-            Assert.Null( await expensesRepository.GetUserAsync("Liahushyn", "Pavlo"));
+            Assert.Null( await expensesRepository.GetUserAsync(Guid.NewGuid()));
         }
     }
 }

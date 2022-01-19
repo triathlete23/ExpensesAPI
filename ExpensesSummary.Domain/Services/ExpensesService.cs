@@ -48,12 +48,11 @@ namespace ExpensesSummary.Domain.Services
                     return ResultError.WithError($"Expense with the amount {expense.Amount} and for the date {expense.Date} has been already created.");
                 }
 
-                var user = await this.expensesRepository.GetUserAsync(expense.User.Lastname, expense.User.Firstname);
+                var user = await this.expensesRepository.GetUserAsync(expense.UserId);
                 if (user == null)
                 {
                     return ResultError.WithError($"Expense with the amount {expense.Amount} and for the date {expense.Date} has been made by an unknown user.");
                 }
-                expense.User.Id = user.Id;
 
                 if (expense.Currency != user.Currency)
                 {
@@ -71,14 +70,19 @@ namespace ExpensesSummary.Domain.Services
             return Result<ICollection<Guid>>.WithData(ids);
         }
 
-        public async Task<Result<IEnumerable<Expense>>> GetAllAsync(User user, string sortOption = null)
+        public async Task<Result<IEnumerable<Expense>>> GetAllAsync(string userId, string sortOption = null)
         {
-            if (user == null || string.IsNullOrEmpty(user.Lastname) || string.IsNullOrEmpty(user.Firstname))
+            if (string.IsNullOrEmpty(userId))
             {
-                return ResultError.WithError("User's firstname and lastname has to be specified.");
+                return ResultError.WithError("UserId cannot be empty.");
             }
 
-            var expenses = await this.expensesRepository.GetAllAsync(user);
+            if (!Guid.TryParse(userId, out Guid parsedUserId))
+            {
+                return ResultError.WithError("UserId has an incorrect format.");
+            }
+
+            var expenses = await this.expensesRepository.GetAllAsync(parsedUserId);
             if (expenses == null || !expenses.Any())
             {
                 return ResultError.WithError("There are no expenses for current user.");

@@ -8,8 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace ExpensesSummary.Tests.Controlers
@@ -25,11 +23,7 @@ namespace ExpensesSummary.Tests.Controlers
             this.controller = new ExpensesController(service.Object);
             this.request = new GetRequest
             {
-                User = new Domain.Models.User
-                {
-                    Firstname = "Anthony",
-                    Lastname = "Spark"
-                }
+                UserId = Guid.NewGuid().ToString()
             };
         }
 
@@ -37,7 +31,7 @@ namespace ExpensesSummary.Tests.Controlers
         public async void ReturnBadRequestIfGetAllAsyncReturnsAnError()
         {
             var error = "error";
-            this.service.Setup(mock => mock.GetAllAsync(It.Is<Domain.Models.User>(u => u.Lastname == this.request.User.Lastname), null)).ReturnsAsync(ResultError.WithError(error));
+            this.service.Setup(mock => mock.GetAllAsync(this.request.UserId, null)).ReturnsAsync(ResultError.WithError(error));
 
             var result = await this.controller.GetAllAsync(request);
 
@@ -48,7 +42,7 @@ namespace ExpensesSummary.Tests.Controlers
         [Fact]
         public async void ReturnOKIfGetAllAsyncReturnsData()
         {
-            this.service.Setup(mock => mock.GetAllAsync(It.Is<Domain.Models.User>(u => u.Lastname == this.request.User.Lastname), null)).ReturnsAsync(Result<IEnumerable<Domain.Models.Expense>>.WithData(new Domain.Models.Expense[] { new Domain.Models.Expense
+            this.service.Setup(mock => mock.GetAllAsync(this.request.UserId, null)).ReturnsAsync(Result<IEnumerable<Domain.Models.Expense>>.WithData(new Domain.Models.Expense[] { new Domain.Models.Expense
             {
                 Currency = Currency.Dollar,
                 Nature = Domain.Enums.Nature.Restaurant,

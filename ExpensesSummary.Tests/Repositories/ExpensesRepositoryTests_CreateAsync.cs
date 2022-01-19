@@ -26,7 +26,7 @@ namespace ExpensesSummary.Tests.Repositories
                 Comment = "Comment",
                 Amount = 571,
                 Date = DateTime.Parse("2021/12/31"),
-                User = new User { Id = romanovaId }
+                UserId = romanovaId
             };
 
             var result = await expensesRepository.CreateAsync(new List<Expense> { expenseToAdd });
