@@ -24,18 +24,14 @@ namespace ExpensesSummary.Repositories.Repositories
             return await dbContext.Expenses.AnyAsync(el => el.Amount == amount && el.Date.Equals(date));
         }
 
-        public async Task<ICollection<Guid>> CreateAsync(ICollection<Expense> expenses)
+        public async Task<Guid> CreateAsync(Expense expense)
         {
-            var ids = new List<Guid>();
-            foreach(var expense in expenses)
-            {
-                var entity = expense.ToEntity();
-                await dbContext.Expenses.AddAsync(entity);
-                ids.Add(entity.Id);
-            }
-
+            var entity = expense.ToEntity();
+            
+            await dbContext.Expenses.AddAsync(entity);
             await dbContext.SaveChangesAsync();
-            return ids;
+            
+            return entity.Id;
         }
         
         public async Task<IEnumerable<Expense>> GetAllAsync(Guid userId)

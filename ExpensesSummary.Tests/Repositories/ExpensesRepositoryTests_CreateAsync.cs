@@ -29,11 +29,9 @@ namespace ExpensesSummary.Tests.Repositories
                 UserId = romanovaId
             };
 
-            var result = await expensesRepository.CreateAsync(new List<Expense> { expenseToAdd });
+            var result = await expensesRepository.CreateAsync(expenseToAdd);
 
-            Assert.NotNull(result);
-            Assert.Single(result);
-            Assert.Equal(context.Expenses.Single(el => el.Amount == expenseToAdd.Amount).Id, result.Single());
+            Assert.Equal(context.Expenses.Single(el => el.Amount == expenseToAdd.Amount).Id, result);
             Assert.Equal(3, context.Users.Single(el => el.Id == romanovaId).Expenses.Count);
         }
     }

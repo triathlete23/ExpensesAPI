@@ -33,9 +33,9 @@ namespace ExpensesSummary.Controllers
         }
 
         [HttpPost]        
-        public async Task<IActionResult> CreateAsync([FromBody] ICollection<Expense> expenses)
+        public async Task<IActionResult> CreateAsync([FromBody] Expense expense)
         {
-            var serviceResult = await expensesService.CreateAsync(expenses);
+            var serviceResult = await expensesService.CreateAsync(expense);
             if (serviceResult.HasError)
             {
                 return BadRequest(serviceResult.Error);

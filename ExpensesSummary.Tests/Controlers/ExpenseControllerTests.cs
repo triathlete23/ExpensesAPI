@@ -28,6 +28,15 @@ namespace ExpensesSummary.Tests.Controlers
         }
 
         [Fact]
+        public async void ReturnBadRequestIfUserIdIsEmpty()
+        {
+            var result = await this.controller.GetAllAsync(new GetRequest { UserId = "" });
+
+            Assert.Equal(400, ((ObjectResult)result).StatusCode);
+            Assert.Equal("UserId cannot be empty.", ((ObjectResult)result).Value);
+        }
+
+        [Fact]
         public async void ReturnBadRequestIfGetAllAsyncReturnsAnError()
         {
             var error = "error";
@@ -62,8 +71,8 @@ namespace ExpensesSummary.Tests.Controlers
         public async void ReturnBadRequestIfCreateAsyncReturnsAnError()
         {
             var error = "error";
-            this.service.Setup(mock => mock.CreateAsync(It.IsAny<ICollection<Domain.Models.Expense>>())).ReturnsAsync(ResultError.WithError(error));
-            var result = await this.controller.CreateAsync(new List<Domain.Models.Expense> { new Domain.Models.Expense() });
+            this.service.Setup(mock => mock.CreateAsync(It.IsAny<Domain.Models.Expense>())).ReturnsAsync(ResultError.WithError(error));
+            var result = await this.controller.CreateAsync(new Domain.Models.Expense());
 
             Assert.Equal(400, ((ObjectResult)result).StatusCode);
             Assert.Equal(error, ((ObjectResult)result).Value);
@@ -72,13 +81,14 @@ namespace ExpensesSummary.Tests.Controlers
         [Fact]
         public async void ReturnOKIfCreateAsyncReturnsData()
         {
-            this.service.Setup(mock => mock.CreateAsync(It.IsAny<ICollection<Domain.Models.Expense>>())).ReturnsAsync(
-                Result<ICollection<Guid>>.WithData(new List<Guid> { Guid.NewGuid(), Guid.NewGuid() })
+            var id = Guid.NewGuid();
+            this.service.Setup(mock => mock.CreateAsync(It.IsAny<Domain.Models.Expense>())).ReturnsAsync(
+                Result<Guid>.WithData(id)
                 );
-            var result = await this.controller.CreateAsync(new List<Domain.Models.Expense> { new Domain.Models.Expense() });
+            var result = await this.controller.CreateAsync(new Domain.Models.Expense());
 
             Assert.Equal(200, ((ObjectResult)result).StatusCode);
-            Assert.Equal(2, ((ICollection<Guid>)((ObjectResult)result).Value).Count);
+            Assert.Equal(id, (Guid)((ObjectResult)result).Value);
         }
     }
 }
