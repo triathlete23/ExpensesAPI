@@ -1,5 +1,6 @@
 ﻿using ExpensesSummary.Domain.Enums;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace ExpensesSummary.Domain.Models
 {
@@ -10,7 +11,7 @@ namespace ExpensesSummary.Domain.Models
         public DateTime Date { get; set; }
         public Nature Nature { get; set; }
         public double Amount { get; set; }
-        public string Currency { get; set; }
+        public string Currency { get; set; }        
         public string Comment { get; set; }
         public Guid UserId { get; set; }
     }

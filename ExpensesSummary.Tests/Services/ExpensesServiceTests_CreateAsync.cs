@@ -4,9 +4,6 @@ using ExpensesSummary.Domain.Ports;
 using ExpensesSummary.Domain.Services;
 using Moq;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace ExpensesSummary.Tests
@@ -31,13 +28,7 @@ namespace ExpensesSummary.Tests
                 Comment = "Some comment",
                 Date = DateTime.Parse("01/01/2022"),
                 Nature = Domain.Enums.Nature.Restaurant,
-                UserId = Guid.NewGuid(),
-                User = new User()
-                {
-                    Currency = Currency.Dollar,
-                    Firstname = "Anthony",
-                    Lastname = "Stark"
-                }
+                UserId = Guid.NewGuid()
             };            
         }
         
@@ -72,17 +63,6 @@ namespace ExpensesSummary.Tests
         }
 
         [Fact]
-        public async void ReturnErrorIfExpenseHasBeenAlreadyCreated()
-        {
-            this.expensesRepository.Setup(mock => mock.ContainsAsync(this.expense.Amount, this.expense.Date))
-                .ReturnsAsync(true);
-
-            var result = await this.service.CreateAsync(this.expense);
-
-            Assert.Equal($"Expense with the amount {this.expense.Amount} and for the date {this.expense.Date} has been already created.", result.Error);
-        }
-
-        [Fact]
         public async void ReturnErrorIfExpenseHasBeenDoneByUnknownUser()
         {
             this.expensesRepository.Setup(mock => mock.GetUserAsync(this.expense.UserId))
@@ -92,6 +72,17 @@ namespace ExpensesSummary.Tests
 
             Assert.Equal($"Expense with the amount {this.expense.Amount} and for the date {this.expense.Date} has been made by an unknown user.", result.Error);
         }
+
+        [Fact]
+        public async void ReturnErrorIfUserHasAlreadyDeclaredCurrentExpense()
+        {
+            this.expensesRepository.Setup(mock => mock.GetUserAsync(this.expense.UserId))
+                .ReturnsAsync(new User { Expenses = new [] { this.expense } });
+
+            var result = await this.service.CreateAsync(this.expense);
+
+            Assert.Equal($"Expense with the amount {this.expense.Amount} and for the date {this.expense.Date} has been already created.", result.Error);
+        }        
 
         [Fact]
         public async void ReturnErrorIfExpenseCurrencyDiffersToUserCurrency()
@@ -112,8 +103,8 @@ namespace ExpensesSummary.Tests
                 .ReturnsAsync(new User { Currency = Currency.Dollar });
             this.expensesRepository.Setup(mock => mock.CreateAsync(It.Is<Expense>(el =>
                 el.Amount == this.expense.Amount &&
-                el.User.Lastname == this.expense.User.Lastname &&
-                el.User.Firstname == this.expense.User.Firstname)))
+                el.Date == this.expense.Date &&
+                el.UserId == this.expense.UserId)))
                 .ReturnsAsync(id);
 
             var result = await this.service.CreateAsync(this.expense);

@@ -58,7 +58,7 @@ namespace ExpensesSummary.Tests
         }
 
         [Fact]
-        public async void ReturnErrorIfUserIdIsAbsent()
+        public async void ReturnErrorIfUserIdIsEmpty()
         {
             var result = await this.service.GetAllAsync("");
 

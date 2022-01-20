@@ -1,4 +1,5 @@
 ﻿using ExpensesSummary.Domain.Models;
+using System.Linq;
 
 namespace ExpensesSummary.Repositories.Extensions
 {
@@ -16,7 +17,8 @@ namespace ExpensesSummary.Repositories.Extensions
                 Id = user.Id,
                 Currency = user.Currency,
                 Firstname = user.Firstname,
-                Lastname = user.Lastname
+                Lastname = user.Lastname,
+                Expenses = user.Expenses.Select(el => el.ToDomainModel()).ToList()
             };
         }
     }

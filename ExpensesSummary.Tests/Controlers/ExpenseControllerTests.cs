@@ -28,15 +28,6 @@ namespace ExpensesSummary.Tests.Controlers
         }
 
         [Fact]
-        public async void ReturnBadRequestIfUserIdIsEmpty()
-        {
-            var result = await this.controller.GetAllAsync(new GetRequest { UserId = "" });
-
-            Assert.Equal(400, ((ObjectResult)result).StatusCode);
-            Assert.Equal("UserId cannot be empty.", ((ObjectResult)result).Value);
-        }
-
-        [Fact]
         public async void ReturnBadRequestIfGetAllAsyncReturnsAnError()
         {
             var error = "error";
@@ -51,15 +42,18 @@ namespace ExpensesSummary.Tests.Controlers
         [Fact]
         public async void ReturnOKIfGetAllAsyncReturnsData()
         {
-            this.service.Setup(mock => mock.GetAllAsync(this.request.UserId, null)).ReturnsAsync(Result<IEnumerable<Domain.Models.Expense>>.WithData(new Domain.Models.Expense[] { new Domain.Models.Expense
-            {
-                Currency = Currency.Dollar,
-                Nature = Domain.Enums.Nature.Restaurant,
-                Comment = "Comment",
-                Amount = 10,
-                Date = DateTime.Parse("2021/12/15"),
-                User = new Domain.Models.User{ Currency = Currency.Dollar, Firstname = "Romanova", Lastname = "Natasha"}
-            } }));
+            this.service.Setup(mock => mock.GetAllAsync(this.request.UserId, null))
+                .ReturnsAsync(Result<IEnumerable<Domain.Models.Expense>>.WithData(new Domain.Models.Expense[] {
+                    new Domain.Models.Expense
+                    {
+                        Currency = Currency.Dollar,
+                        Nature = Domain.Enums.Nature.Restaurant,
+                        Comment = "Comment",
+                        Amount = 10,
+                        Date = DateTime.Parse("2021/12/15"),
+                        User = new Domain.Models.User{ Currency = Currency.Dollar, Firstname = "Romanova", Lastname = "Natasha"}
+                    }
+                }));
 
             var result = await this.controller.GetAllAsync(request);
 

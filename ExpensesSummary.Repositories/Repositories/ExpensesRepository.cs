@@ -19,11 +19,6 @@ namespace ExpensesSummary.Repositories.Repositories
             this.dbContext = context;
         }
 
-        public async Task<bool> ContainsAsync(double amount, DateTime date)
-        {
-            return await dbContext.Expenses.AnyAsync(el => el.Amount == amount && el.Date.Equals(date));
-        }
-
         public async Task<Guid> CreateAsync(Expense expense)
         {
             var entity = expense.ToEntity();
@@ -49,7 +44,7 @@ namespace ExpensesSummary.Repositories.Repositories
 
         public async Task<User> GetUserAsync(Guid userId)
         {
-            var user = await dbContext.Users.FirstOrDefaultAsync(el => 
+            var user = await dbContext.Users.Include(el => el.Expenses).FirstOrDefaultAsync(el => 
                 el.Id == userId);
             return user.ToDomainModel();
         }
