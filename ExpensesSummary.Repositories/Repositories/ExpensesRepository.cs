@@ -44,9 +44,16 @@ namespace ExpensesSummary.Repositories.Repositories
 
         public async Task<User> GetUserAsync(Guid userId)
         {
-            var user = await dbContext.Users.Include(el => el.Expenses).FirstOrDefaultAsync(el => 
-                el.Id == userId);
+            var user = await dbContext.Users.FirstOrDefaultAsync(el => el.Id == userId);
             return user.ToDomainModel();
+        }
+
+        public async Task<bool> ContainsAsync(Expense expense)
+        {
+            return await dbContext.Expenses.AnyAsync(el => 
+                el.UserId == expense.UserId && 
+                el.Amount == expense.Amount && 
+                el.Date == expense.Date);
         }
     }
 }

@@ -23,6 +23,7 @@ namespace ExpensesSummary.Tests.Repositories
             Assert.Equal(Currency.Dollar, user.Currency);
             Assert.Equal("Anthony", user.Firstname);
             Assert.Equal("Spark", user.Lastname);
+            Assert.False(user.Expenses.Any());
         }
 
         [Fact]
@@ -31,7 +32,7 @@ namespace ExpensesSummary.Tests.Repositories
             using var context = TestDbInitilizer.Initialize();
             var expensesRepository = new ExpensesRepository(context);
 
-            Assert.Null( await expensesRepository.GetUserAsync(Guid.NewGuid()));
+            Assert.Null(await expensesRepository.GetUserAsync(Guid.NewGuid()));
         }
     }
 }

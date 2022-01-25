@@ -77,7 +77,11 @@ namespace ExpensesSummary.Tests
         public async void ReturnErrorIfUserHasAlreadyDeclaredCurrentExpense()
         {
             this.expensesRepository.Setup(mock => mock.GetUserAsync(this.expense.UserId))
-                .ReturnsAsync(new User { Expenses = new [] { this.expense } });
+                .ReturnsAsync(new User { Id = this.expense.UserId });
+            this.expensesRepository.Setup(mock => mock.ContainsAsync(It.Is<Expense>(el =>
+                el.UserId == this.expense.UserId &&
+                el.Amount == this.expense.Amount &&
+                el.Date == this.expense.Date))).ReturnsAsync(true);
 
             var result = await this.service.CreateAsync(this.expense);
 

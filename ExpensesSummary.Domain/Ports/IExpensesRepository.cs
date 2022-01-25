@@ -10,5 +10,6 @@ namespace ExpensesSummary.Domain.Ports
         Task<Guid> CreateAsync(Expense expense);
         Task<IEnumerable<Expense>> GetAllAsync(Guid userId);
         Task<User> GetUserAsync(Guid userId);
+        Task<bool> ContainsAsync(Expense expense);
     }
 }

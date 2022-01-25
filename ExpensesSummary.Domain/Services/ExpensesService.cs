@@ -41,7 +41,7 @@ namespace ExpensesSummary.Domain.Services
                 return ResultError.WithError($"Expense with the amount {expense.Amount} and for the date {expense.Date} has been made by an unknown user.");
             }
 
-            var hasUserAlreadyDeclaredCurrentExpense = user.Expenses.Any(el => el.Amount == expense.Amount && el.Date == expense.Date);
+            var hasUserAlreadyDeclaredCurrentExpense = await this.expensesRepository.ContainsAsync(expense);
             if (hasUserAlreadyDeclaredCurrentExpense)
             {
                 return ResultError.WithError($"Expense with the amount {expense.Amount} and for the date {expense.Date} has been already created.");
