@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using FluentValidation.Results;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ExpensesSummary.Domain.DomainResult
 {
@@ -15,11 +17,19 @@ namespace ExpensesSummary.Domain.DomainResult
 
         public string[] Errors { get; private set; }
 
-        public static ResultError WithError(params string[] errors)
+        public static ResultError WithErrors(params string[] errors)
         {
             return new ResultError
             {
                 Errors = errors
+            };
+        }
+
+        public static ResultError WithErrors(IEnumerable<ValidationFailure> failures)
+        {
+            return new ResultError
+            {
+                Errors = failures?.Select(el => el.ErrorMessage).ToArray()
             };
         }
     }

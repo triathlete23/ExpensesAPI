@@ -2,6 +2,7 @@ using ExpensesSummary.Domain.Constants;
 using ExpensesSummary.Domain.Models;
 using ExpensesSummary.Domain.Ports;
 using ExpensesSummary.Domain.Services;
+using FluentValidation;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace ExpensesSummary.Tests
         public ExpensesServiceTests_GetAllAsync()
         {
             this.expensesRepository = new Mock<IExpensesRepository>();
-            this.service = new ExpensesService(this.expensesRepository.Object);
+            this.service = new ExpensesService(this.expensesRepository.Object, Mock.Of<IValidator<Expense>>());
 
             this.expenses = new List<Expense>
             {

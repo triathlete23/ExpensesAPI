@@ -1,7 +1,10 @@
+using ExpensesSummary.Domain.Models;
+using ExpensesSummary.Domain.Models.Validators;
 using ExpensesSummary.Domain.Ports;
 using ExpensesSummary.Domain.Services;
 using ExpensesSummary.Repositories.Context;
 using ExpensesSummary.Repositories.Repositories;
+using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -36,6 +39,7 @@ namespace ExpensesSummary
 
             services.AddScoped<IExpensesService, ExpensesService>();
             services.AddScoped<IExpensesRepository, ExpensesRepository>();
+            services.AddScoped<IValidator<Expense>, ExpenseValidator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -31,7 +31,7 @@ namespace ExpensesSummary.Tests.Controlers
         public async void ReturnBadRequestIfGetAllAsyncReturnsAnError()
         {
             var error = "error";
-            this.service.Setup(mock => mock.GetAllAsync(this.request.UserId, null)).ReturnsAsync(ResultError.WithError(error));
+            this.service.Setup(mock => mock.GetAllAsync(this.request.UserId, null)).ReturnsAsync(ResultError.WithErrors(error));
 
             var result = await this.controller.GetAllAsync(request);
 
@@ -65,7 +65,7 @@ namespace ExpensesSummary.Tests.Controlers
         public async void ReturnBadRequestIfCreateAsyncReturnsAnError()
         {
             var error = "error";
-            this.service.Setup(mock => mock.CreateAsync(It.IsAny<Domain.Models.Expense>())).ReturnsAsync(ResultError.WithError(error));
+            this.service.Setup(mock => mock.CreateAsync(It.IsAny<Domain.Models.Expense>())).ReturnsAsync(ResultError.WithErrors(error));
             var result = await this.controller.CreateAsync(new Domain.Models.Expense());
 
             Assert.Equal(400, ((ObjectResult)result).StatusCode);

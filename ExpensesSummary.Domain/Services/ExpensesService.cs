@@ -1,6 +1,8 @@
 ﻿using ExpensesSummary.Domain.DomainResult;
 using ExpensesSummary.Domain.Models;
+using ExpensesSummary.Domain.Models.Validators;
 using ExpensesSummary.Domain.Ports;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,44 +14,20 @@ namespace ExpensesSummary.Domain.Services
     public class ExpensesService : IExpensesService
     {
         private readonly IExpensesRepository expensesRepository;
+        private readonly IValidator<Expense> validator;
 
-        public ExpensesService(IExpensesRepository expensesRepository)
+        public ExpensesService(IExpensesRepository expensesRepository, IValidator<Expense> validator)
         {
             this.expensesRepository = expensesRepository;
+            this.validator = validator;
         }
 
         public async Task<Result<Guid>> CreateAsync(Expense expense)
-        {
-            if (expense.Date >= DateTime.Now)
+        {            
+            var validation = await this.validator.ValidateAsync(expense);
+            if (!validation.IsValid)
             {
-                return ResultError.WithError($"Expense with the amount {expense.Amount} and the date {expense.Date} must be in the past.");
-            }
-
-            if (expense.Date < DateTime.Today.AddMonths(-3))
-            {
-                return ResultError.WithError($"Expense with the amount {expense.Amount} and the date {expense.Date} should be done during the last 3 months.");
-            }
-
-            if (string.IsNullOrEmpty(expense.Comment))
-            {
-                return ResultError.WithError($"Expense with the amount {expense.Amount} and the date {expense.Date} should contain a comment.");
-            }
-
-            var user = await this.expensesRepository.GetUserAsync(expense.UserId);
-            if (user == null)
-            {
-                return ResultError.WithError($"Expense with the amount {expense.Amount} and for the date {expense.Date} has been made by an unknown user.");
-            }
-
-            var hasUserAlreadyDeclaredCurrentExpense = await this.expensesRepository.ContainsAsync(expense);
-            if (hasUserAlreadyDeclaredCurrentExpense)
-            {
-                return ResultError.WithError($"Expense with the amount {expense.Amount} and for the date {expense.Date} has been already created.");
-            }
-
-            if (expense.Currency != user.Currency)
-            {
-                return ResultError.WithError($"Expense with the amount {expense.Amount} and for the date {expense.Date} has the currency that is different to its user's currency.");
+                return ResultError.WithErrors(validation.Errors);
             }
 
             var id = await this.expensesRepository.CreateAsync(expense);
@@ -60,18 +38,18 @@ namespace ExpensesSummary.Domain.Services
         {
             if (string.IsNullOrEmpty(userId))
             {
-                return ResultError.WithError("UserId cannot be empty.");
+                return ResultError.WithErrors("UserId cannot be empty.");
             }
 
             if (!Guid.TryParse(userId, out Guid parsedUserId))
             {
-                return ResultError.WithError("UserId has an incorrect format.");
+                return ResultError.WithErrors("UserId has an incorrect format.");
             }
 
             var expenses = await this.expensesRepository.GetAllAsync(parsedUserId);
             if (expenses == null || !expenses.Any())
             {
-                return ResultError.WithError("There are no expenses for current user.");
+                return ResultError.WithErrors("There are no expenses for current user.");
             }
 
             if (!string.IsNullOrEmpty(sortOption) && sortOption.ToLower() == "date")
