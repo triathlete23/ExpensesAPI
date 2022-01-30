@@ -3,6 +3,6 @@
     public interface IResult
     {
         bool HasError { get; }
-        string Error { get; }
+        string[] Errors { get; }
     }
 }

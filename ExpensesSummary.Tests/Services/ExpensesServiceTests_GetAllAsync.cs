@@ -62,7 +62,7 @@ namespace ExpensesSummary.Tests
         {
             var result = await this.service.GetAllAsync("");
 
-            Assert.Equal("UserId cannot be empty.", result.Error);
+            Assert.Equal("UserId cannot be empty.", result.Errors.Single());
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace ExpensesSummary.Tests
         {
             var result = await this.service.GetAllAsync("invalid");
 
-            Assert.Equal("UserId has an incorrect format.", result.Error);
+            Assert.Equal("UserId has an incorrect format.", result.Errors.Single());
         }
 
         [Fact]
@@ -78,7 +78,7 @@ namespace ExpensesSummary.Tests
         {
             var result = await this.service.GetAllAsync(Guid.NewGuid().ToString());
 
-            Assert.Equal("There are no expenses for current user.", result.Error);
+            Assert.Equal("There are no expenses for current user.", result.Errors.Single());
         }
 
         [Fact]

@@ -1,34 +1,34 @@
-﻿namespace ExpensesSummary.Domain.DomainResult
+﻿using System.Linq;
+
+namespace ExpensesSummary.Domain.DomainResult
 {
     public class Result : IResult
     {
-        public bool HasError => !string.IsNullOrWhiteSpace(this.Error);
+        public bool HasError => this.Errors.Any();
 
-        public string ErrorCode { get; private set; }
-
-        public string Error { get; private set; }
+        public string[] Errors { get; private set; }
     }
 
     public class ResultError : IResult
     {
-        public bool HasError => !string.IsNullOrWhiteSpace(this.Error);
+        public bool HasError => this.Errors.Any();
 
-        public string Error { get; private set; }
+        public string[] Errors { get; private set; }
 
-        public static ResultError WithError(string error)
+        public static ResultError WithError(params string[] errors)
         {
             return new ResultError
             {
-                Error = error
+                Errors = errors
             };
         }
     }
 
     public class Result<T> : IResult
     {
-        public bool HasError => !string.IsNullOrWhiteSpace(this.Error);
+        public bool HasError => this.Errors.Any();
 
-        public string Error { get; private set; }
+        public string[] Errors { get; private set; }
 
         public T Data { get; private set; }
 
@@ -37,7 +37,7 @@
             return new Result<T>
             {
                 Data = data,
-                Error = null
+                Errors = new string[0]
             };
         }
 
@@ -45,7 +45,7 @@
         {
             return new Result<T>
             {
-                Error = result.Error
+                Errors = result.Errors
             };
         }
     }

@@ -26,7 +26,7 @@ namespace ExpensesSummary.Controllers
             var serviceResult = await expensesService.GetAllAsync(request.UserId, request.SortOption);
             if (serviceResult.HasError)
             {
-                return BadRequest(serviceResult.Error);
+                return BadRequest(string.Join(' ', serviceResult.Errors));
             }
 
             return Ok(serviceResult.Data.Select(el => el.ToApiResponse()).ToArray());
@@ -38,7 +38,7 @@ namespace ExpensesSummary.Controllers
             var serviceResult = await expensesService.CreateAsync(expense);
             if (serviceResult.HasError)
             {
-                return BadRequest(serviceResult.Error);
+                return BadRequest(string.Join(' ', serviceResult.Errors));
             }
 
             return Ok(serviceResult.Data);

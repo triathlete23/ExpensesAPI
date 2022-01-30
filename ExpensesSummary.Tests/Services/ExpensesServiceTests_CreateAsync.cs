@@ -4,6 +4,7 @@ using ExpensesSummary.Domain.Ports;
 using ExpensesSummary.Domain.Services;
 using Moq;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace ExpensesSummary.Tests
@@ -39,7 +40,7 @@ namespace ExpensesSummary.Tests
 
             var result = await this.service.CreateAsync(this.expense);
 
-            Assert.Equal($"Expense with the amount {this.expense.Amount} and the date {this.expense.Date} must be in the past.", result.Error);
+            Assert.Equal($"Expense with the amount {this.expense.Amount} and the date {this.expense.Date} must be in the past.", result.Errors.Single());
         }
 
         [Fact]
@@ -49,7 +50,7 @@ namespace ExpensesSummary.Tests
 
             var result = await this.service.CreateAsync(this.expense);
 
-            Assert.Equal($"Expense with the amount {this.expense.Amount} and the date {this.expense.Date} should be done during the last 3 months.", result.Error);
+            Assert.Equal($"Expense with the amount {this.expense.Amount} and the date {this.expense.Date} should be done during the last 3 months.", result.Errors.Single());
         }
 
         [Fact]
@@ -59,7 +60,7 @@ namespace ExpensesSummary.Tests
 
             var result = await this.service.CreateAsync(this.expense);
 
-            Assert.Equal($"Expense with the amount {this.expense.Amount} and the date {this.expense.Date} should contain a comment.", result.Error);
+            Assert.Equal($"Expense with the amount {this.expense.Amount} and the date {this.expense.Date} should contain a comment.", result.Errors.Single());
         }
 
         [Fact]
@@ -70,7 +71,7 @@ namespace ExpensesSummary.Tests
 
             var result = await this.service.CreateAsync(this.expense);
 
-            Assert.Equal($"Expense with the amount {this.expense.Amount} and for the date {this.expense.Date} has been made by an unknown user.", result.Error);
+            Assert.Equal($"Expense with the amount {this.expense.Amount} and for the date {this.expense.Date} has been made by an unknown user.", result.Errors.Single());
         }
 
         [Fact]
@@ -85,7 +86,7 @@ namespace ExpensesSummary.Tests
 
             var result = await this.service.CreateAsync(this.expense);
 
-            Assert.Equal($"Expense with the amount {this.expense.Amount} and for the date {this.expense.Date} has been already created.", result.Error);
+            Assert.Equal($"Expense with the amount {this.expense.Amount} and for the date {this.expense.Date} has been already created.", result.Errors.Single());
         }        
 
         [Fact]
@@ -96,7 +97,7 @@ namespace ExpensesSummary.Tests
 
             var result = await this.service.CreateAsync(this.expense);
 
-            Assert.Equal($"Expense with the amount {this.expense.Amount} and for the date {this.expense.Date} has the currency that is different to its user's currency.", result.Error);
+            Assert.Equal($"Expense with the amount {this.expense.Amount} and for the date {this.expense.Date} has the currency that is different to its user's currency.", result.Errors.Single());
         }
 
         [Fact]
